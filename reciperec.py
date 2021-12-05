@@ -1,11 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import pathlib
 from PIL import Image
 import base64
-import requests
-from io import StringIO
 
 CATEGORIES = ('Frozen Desserts', 'Chicken Breast', 'Beverages', 'Soy/Tofu',
        'Vegetable', 'Pie', 'Chicken', 'Dessert', 'Southwestern U.S.',
