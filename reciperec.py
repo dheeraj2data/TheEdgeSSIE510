@@ -740,4 +740,4 @@ st.markdown("## Thanks for visiting!")
 st.write("If you enjoyed using the application, Click the button to celebrate.")
 btn = st.button("Celebrate!")
 if btn:
-    data_load_state.balloons()
+    st.balloons()
