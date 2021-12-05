@@ -637,11 +637,20 @@ minrating = st.sidebar.slider('Averge Recipe Rating:', 0, 5, 2)
 reviews = st.sidebar.slider('# People Reviewed the Recipe:', 1, 2892, 30)
 
 st.sidebar.markdown(" ## Nutrional Information Filters:")
-carbcontent = st.sidebar.slider('Carbohydrate Content (g/serving):', 0, 108294, 30)
+calories = st.sidebar.slider('Calories (cal):', 0, 612854, 1500)
+fatcontent = st.sidebar.slider('Fat Content (g):', 0, 64368, 30)
+saturatedfatcontent = st.sidebar.slider('Saturated Fat Content (g):', 0, 26735, 500)
+cholesterolcontent = st.sidebar.slider('Cholesterol Content (g):', 0, 89890, 1500)
+sodiumcontent = st.sidebar.slider('Sodium Content (g):', 0, 731055, 3000)
+carbcontent = st.sidebar.slider('Carbohydrate Content (g):', 0, 108293, 30)
+fibercontent = st.sidebar.slider('Fiber Content (g):', 0, 3010, 1000)
+sugarcontent = st.sidebar.slider('Sugar Content (g):', 0, 90680, 10000)
+proteincontent = st.sidebar.slider('Protein Content (g):', 0, 18394, 4000)
 
+st.sidebar.markdown(" ## Interest Matching Filters:")
 categories = st.sidebar.multiselect("Select The Categories Which You Want To Explore:", CATEGORIES)
 keywords = st.sidebar.multiselect("Select The Keyword You Resonate With:", KEYWORDS)
-keywords = st.sidebar.multiselect("Select The Ingredients You Want To Use:", INGREDIENTS)
+ingredients = st.sidebar.multiselect("Select The Ingredients You Want To Use:", INGREDIENTS)
 
 
 
@@ -672,19 +681,58 @@ def load_data(url):
     data = read_csv(url)
     return data
 
+
+@st.cache
+def get_filtered_data(data,minrating,reviews,calories ,fatcontent ,saturatedfatcontent ,cholesterolcontent ,sodiumcontent ,carbcontent ,fibercontent ,sugarcontent ,proteincontent ,categories,keywords,ingredients):
+
+    filtered_data = data.loc[(data["Keywords"].str.contains('|'.join(keywords))) | (data["RecipeIngredientParts"].str.contains('|'.join(ingredients))) | (data["RecipeCategory"].str.contains('|'.join(categories)))]
+    filtered_data = filtered_data.loc[data["Rating"]<=minrating]
+    filtered_data = filtered_data.loc[data["Number of Reviews"]<=reviews]
+    filtered_data = filtered_data.loc[data["Calories"]<=calories]
+    filtered_data = filtered_data.loc[data["FatContent"]<=fatcontent]
+    filtered_data = filtered_data.loc[data["SaturatedFatContent"]<=saturatedfatcontent]
+    filtered_data = filtered_data.loc[data["CholesterolContent"]<=cholesterolcontent]
+    filtered_data = filtered_data.loc[data["SodiumContent"]<=sodiumcontent]
+    filtered_data = filtered_data.loc[data["CarbohydrateContent"]<=carbcontent]
+    filtered_data = filtered_data.loc[data["FiberContent"]<=fibercontent]
+    filtered_data = filtered_data.loc[data["SugarContent"]<=sugarcontent]
+    filtered_data = filtered_data.loc[data["ProteinContent"]<=proteincontent]
+    return filtered_data
+
 data_load_state = st.image('./code/images/giphy.gif')
 
 data = pd.read_csv("https://ssie510dss.s3.amazonaws.com/masterdata.csv")
 
 
-filtered_data = data.loc[(data["Rating"] >= minrating)]
+filtered_data = get_filtered_data(data,minrating,reviews,calories ,fatcontent ,saturatedfatcontent ,cholesterolcontent ,sodiumcontent ,carbcontent ,fibercontent ,sugarcontent ,proteincontent ,categories,keywords,ingredients)
 
+if filtered_data.shape[0]==0:
+    data_load_state.markdown(" ## Sorry! We don't have recipes matching the criteria! Please consider altering the criteria...")
+else:
+    RecipeNames = tuple(filtered_data["Name"].unique())
+    statusmessage = "### Cool! We have {} recipes matching your preferences!!".format(len(RecipeNames))
+    data_load_state.markdown(statusmessage)
 
-data_load_state.table(filtered_data.sort_values(by="Rating",ascending=False).head().style.hide_index())
+    selection = st.selectbox(
+                "Select a recipe you want to explore:", options=RecipeNames,index=0
+            )
+    selectedrecipe = filtered_data.loc[filtered_data["Name"] == selection]
+    st.markdown(f"# {selection}")
 
-if st.button('Download the data shown here? Click me!!'):
-    tmp_download_link = download_link(data.head(), 'RecipesMatchingYourChoices.csv', 'Click here to download your data!')
-    st.markdown(tmp_download_link, unsafe_allow_html=True)
+    st.subheader("Steps:")
+    col1, col2 = st.columns(2)
+    ingredients_disp = list(selectedrecipe.RecipeInstructions.values)[0].split(",")
+    print(ingredients_disp)
+    ingredients_disp1 = ingredients_disp[len(ingredients_disp) // 2 :]
+    ingredients_disp2 = ingredients_disp[: len(ingredients_disp) // 2]
+    for ingred in ingredients_disp1:
+        col1.markdown(f"* {ingred}")
+    for ingred in ingredients_disp2:
+        col2.markdown(f"* {ingred}")
+
+    if st.button('Download the data shown here? Click me!!'):
+        tmp_download_link = download_link(filtered_data.head(), 'RecipesMatchingYourChoices.csv', 'Click here to download your data!')
+        st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 
 st.markdown("## Thanks for visiting!")
