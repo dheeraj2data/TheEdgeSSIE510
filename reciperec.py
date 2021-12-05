@@ -727,7 +727,7 @@ else:
         st.markdown(f"* {ingred}")
 
     if st.button('Download the data shown here? Click me!!'):
-        tmp_download_link = download_link(filtered_data.head(), 'RecipesMatchingYourChoices.csv', 'Click here to download your data!')
+        tmp_download_link = download_link(filtered_data, 'RecipesMatchingYourChoices.csv', 'Click here to download your data!')
         st.markdown(tmp_download_link, unsafe_allow_html=True)
 
 
