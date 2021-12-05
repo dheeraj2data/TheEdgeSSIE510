@@ -720,16 +720,11 @@ else:
     st.markdown(f"# {selection}")
 
     st.subheader("Steps:")
-    col1, col2 = st.columns(2)
     ingredients_disp = list(selectedrecipe.RecipeInstructions.values)[0].split('", "')
     ingredients_disp = [ingred.rstrip('"').lstrip(' "') for ingred in ingredients_disp]
     print(ingredients_disp)
-    ingredients_disp1 = ingredients_disp[len(ingredients_disp) // 2 :]
-    ingredients_disp2 = ingredients_disp[: len(ingredients_disp) // 2]
-    for ingred in ingredients_disp1:
-        col1.markdown(f"* {ingred}")
-    for ingred in ingredients_disp2:
-        col2.markdown(f"* {ingred}")
+    for ingred in ingredients_disp:
+        st.markdown(f"* {ingred}")
 
     if st.button('Download the data shown here? Click me!!'):
         tmp_download_link = download_link(filtered_data.head(), 'RecipesMatchingYourChoices.csv', 'Click here to download your data!')
