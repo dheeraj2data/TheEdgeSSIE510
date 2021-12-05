@@ -721,7 +721,8 @@ else:
 
     st.subheader("Steps:")
     col1, col2 = st.columns(2)
-    ingredients_disp = list(selectedrecipe.RecipeInstructions.values)[0].split(",")
+    ingredients_disp = list(selectedrecipe.RecipeInstructions.values)[0].split('", "')
+    ingredients_disp = [ingred.rstrip('"').lstrip(' "') for ingred in ingredients_disp]
     print(ingredients_disp)
     ingredients_disp1 = ingredients_disp[len(ingredients_disp) // 2 :]
     ingredients_disp2 = ingredients_disp[: len(ingredients_disp) // 2]
